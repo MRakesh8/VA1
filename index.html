@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>RS Voice Assistant — SSEC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="RS Voice Assistant – speak to open websites, play music, search the web and more.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Aurora background blobs -->
+    <div class="aurora"><i></i><i></i><i></i><i></i></div>
+
+    <!-- Particle burst layer (JS fills this) -->
+    <div id="particleLayer" class="particle-layer"></div>
+
+    <!-- Toast notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- ── TOP BAR ───────────────────────────────────────── -->
+    <nav class="topbar">
+        <div class="topbar-logo">
+            <div class="logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="23" />
+                    <line x1="8" y1="23" x2="16" y2="23" />
+                </svg>
+            </div>
+            <div class="logo-text-wrap">
+                <span class="logo-text">RS Assistant</span>
+            </div>
+        </div>
+
+        <div class="topbar-right">
+            <span class="speaking-badge" id="speakingBadge"><span class="sb-dot"></span>SPEAKING</span>
+            <div class="clock-wrap">
+                <span class="clock-display" id="clockDisplay">--:-- --</span>
+                <span class="clock-date" id="clockDate">---</span>
+            </div>
+            <button class="settings-btn" onclick="openSettings()" title="Settings" id="settingsBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- SETTINGS OVERLAY -->
+    <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+
+    <!-- SETTINGS DRAWER -->
+    <div class="settings-drawer" id="settingsDrawer">
+        <div class="sd-header">
+            <div class="sd-title">⚙️ Settings</div>
+            <button class="sd-close" onclick="closeSettings()">✕</button>
+        </div>
+        <div class="sd-body">
+
+            <!-- GENERAL -->
+            <div class="sd-section">
+                <div class="sd-section-title">General</div>
+                <div class="sd-row">
+                    <div class="sd-row-label">Assistant Name<span>Shown in topbar &amp; responses</span></div>
+                    <input class="sd-input" id="setName" type="text" value="RS Assistant" maxlength="20"
+                        placeholder="Your assistant name">
+                </div>
+                <div class="sd-row">
+                    <div class="sd-row-label">Language<span>Speech recognition language</span></div>
+                    <select class="sd-select" id="setLang">
+                        <option value="en-US">English (US)</option>
+                        <option value="en-GB">English (UK)</option>
+                        <option value="en-IN" selected>English (India)</option>
+                        <option value="ta-IN">Tamil</option>
+                        <option value="hi-IN">Hindi</option>
+                        <option value="fr-FR">French</option>
+                        <option value="de-DE">German</option>
+                        <option value="es-ES">Spanish</option>
+                    </select>
+                </div>
+                <div class="sd-row">
+                    <div class="sd-row-label">Sound Effects<span>Play chime on command success</span></div>
+                    <label class="sd-toggle"><input type="checkbox" id="setSfx" checked><span
+                            class="slider"></span></label>
+                </div>
+                <div class="sd-row">
+                    <div class="sd-row-label">Auto Stop Mic<span>Stop mic after each command</span></div>
+                    <label class="sd-toggle"><input type="checkbox" id="setAutoStop"><span
+                            class="slider"></span></label>
+                </div>
+                <div class="sd-row">
+                    <div class="sd-row-label">Gemini Live Mode<span>Auto-listen for follow-up questions</span></div>
+                    <label class="sd-toggle"><input type="checkbox" id="setAutoListen"><span
+                            class="slider"></span></label>
+                </div>
+            </div>
+
+            <!-- VOICE -->
+            <div class="sd-section">
+                <div class="sd-section-title">Voice</div>
+                <div class="sd-row">
+                    <div class="sd-row-label">Volume<span>How loud responses are</span></div>
+                    <input class="sd-range" id="setVolume" type="range" min="0.1" max="1" step="0.05" value="1">
+                </div>
+                <div class="sd-row">
+                    <div class="sd-row-label">Speech Speed<span>Adjust speaking rate</span></div>
+                    <input class="sd-range" id="setRate" type="range" min="0.5" max="2" step="0.1" value="1">
+                </div>
+            </div>
+
+            <!-- APPEARANCE -->
+            <div class="sd-section">
+                <div class="sd-section-title">Theme Colour</div>
+                <div class="sd-row">
+                    <div class="sd-row-label">Accent Colour<span>Changes glow &amp; highlights</span></div>
+                    <div class="sd-swatches" id="swatchList">
+                        <div class="sd-swatch active" style="background:#b44fff;"
+                            onclick="setTheme('#b44fff','180,79,255')"></div>
+                        <div class="sd-swatch" style="background:#00d4ff;" onclick="setTheme('#00d4ff','0,212,255')">
+                        </div>
+                        <div class="sd-swatch" style="background:#ff4ecd;" onclick="setTheme('#ff4ecd','255,78,205')">
+                        </div>
+                        <div class="sd-swatch" style="background:#00e676;" onclick="setTheme('#00e676','0,230,118')">
+                        </div>
+                        <div class="sd-swatch" style="background:#ff6b35;" onclick="setTheme('#ff6b35','255,107,53')">
+                        </div>
+                        <div class="sd-swatch" style="background:#ffd60a;" onclick="setTheme('#ffd60a','255,214,10')">
+                        </div>
+                        <div class="sd-swatch" style="background:#e63946;" onclick="setTheme('#e63946','230,57,70')">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMMANDS GUIDE -->
+            <div class="sd-section">
+                <div class="sd-section-title">Command Guide</div>
+                <div class="cmd-guide">
+                    <div class="cg-item">🔇 <b>stop</b> / <b>shut up</b> — stop talking</div>
+                    <div class="cg-item">👋 <b>hello</b> / <b>bye</b> — greetings</div>
+                    <div class="cg-item">⏰ <b>what time</b> / <b>today</b></div>
+                    <div class="cg-item">⛅ <b>weather</b> — live forecast</div>
+                    <div class="cg-item">😂 <b>tell me a joke</b></div>
+                    <div class="cg-item">💡 <b>fun fact</b> / <b>motivate me</b></div>
+                    <div class="cg-item">🧮 <b>calculate</b> 5 + 3 × 2</div>
+                    <div class="cg-item">⏲️ <b>set timer</b> for 5 minutes</div>
+                    <div class="cg-item">🌐 <b>translate</b> hello <b>to</b> tamil</div>
+                    <div class="cg-item">🌐 <b>open</b> [site] / 🔍 <b>search</b> [query]</div>
+                    <div class="cg-item">▶️ <b>play</b> [song name]</div>
+                    <div class="cg-item">🗺️ <b>navigate to</b> [place]</div>
+                    <div class="cg-item">🪙 <b>flip a coin</b> / 🎲 <b>roll a dice</b></div>
+                    <div class="cg-item">✊ <b>rock paper scissors</b></div>
+                    <div class="cg-item">🔐 <b>generate password</b></div>
+                    <div class="cg-item">🔤 <b>spell</b> [word]</div>
+                    <div class="cg-item">🎓 <b>tell me about SSEC</b></div>
+                    <div class="cg-item">🧠 <b>Any question</b> → Smart AI</div>
+                </div>
+            </div>
+
+        </div>
+        <button class="sd-save" onclick="saveSettings()">✅ Apply Settings</button>
+    </div>
+
+    <!-- ── WORKSPACE ──────────────────────────────────────── -->
+    <div class="workspace">
+
+        <!-- LEFT PANEL: MIC CONTROL -->
+        <div class="glass left-panel">
+
+            <!-- Panel header -->
+            <div class="lp-header">
+                <div class="panel-label">RS Assistant</div>
+                <div class="panel-title">⚡ VOICE ASSISTANT ⚡</div>
+                <div class="panel-sub">Tap the mic — speak any command</div>
+            </div>
+
+            <!-- MIC STAGE -->
+            <div class="mic-stage">
+                <!-- Particle burst ring (shown on command detected) -->
+                <div class="cmd-burst" id="cmdBurst"></div>
+
+                <div class="ripple-wrap" id="rippleWrap">
+                    <div class="ripple"></div>
+                    <div class="ripple"></div>
+                    <div class="ripple"></div>
+                </div>
+                <div class="ring-outer" id="ringOuter"></div>
+                <div class="ring-spin" id="ringSpin"></div>
+                <button id="micBtn" onclick="toggleMic()" title="Click to start listening">
+                    <svg id="micIcon" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                        <line x1="12" y1="19" x2="12" y2="23" />
+                        <line x1="8" y1="23" x2="16" y2="23" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- STATUS BADGE -->
+            <div class="status-badge" id="statusBadge">
+                <span class="dot" id="statusDot"></span>
+                <span id="statusText">MICROPHONE OFF</span>
+            </div>
+
+            <!-- SOUND BARS -->
+            <div class="bars-row" id="barsRow">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+
+            <!-- HINT CHIPS — clickable -->
+            <div class="chips-area">
+                <div class="chips-label">Try saying…</div>
+                <div class="chips">
+                    <div class="chip" onclick="handleChip('what time is it')">⏰ what time</div>
+                    <div class="chip" onclick="handleChip('tell me a joke')">😂 joke</div>
+                    <div class="chip" onclick="handleChip('weather')">⛅ weather</div>
+                    <div class="chip" onclick="handleChip('tell me about SSEC')">🎓 about SSEC</div>
+                    <div class="chip" onclick="handleChip('play lo-fi music')">🎵 play music</div>
+                    <div class="chip" onclick="handleChip('motivate me')">💪 motivate</div>
+                    <div class="chip" onclick="handleChip('flip a coin')">🪙 flip coin</div>
+                    <div class="chip" onclick="handleChip('fun fact')">💡 fun fact</div>
+                </div>
+            </div>
+
+            <!-- VOICE SELECTOR -->
+            <div class="voice-area">
+                <div class="voice-label">🎙 Choose Assistant Voice</div>
+                <div class="voice-grid" id="voiceGrid">
+                    <div class="voice-card active" id="vc0" style="--vc-color:#b44fff; --vc-rgb:180,79,255;"
+                        onclick="selectVoice(0)">
+                        <span class="vc-icon">👩‍💼</span>
+                        <div class="vc-name">ARIA</div>
+                        <div class="vc-desc">Calm · Soft · Female</div>
+                        <div class="vc-wave">
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                        </div>
+                    </div>
+                    <div class="voice-card" id="vc1" style="--vc-color:#00d4ff; --vc-rgb:0,212,255;"
+                        onclick="selectVoice(1)">
+                        <span class="vc-icon">🧔</span>
+                        <div class="vc-name">ZEUS</div>
+                        <div class="vc-desc">Deep · Slow · Male</div>
+                        <div class="vc-wave">
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                        </div>
+                    </div>
+                    <div class="voice-card" id="vc2" style="--vc-color:#00e676; --vc-rgb:0,230,118;"
+                        onclick="selectVoice(2)">
+                        <span class="vc-icon">🤖</span>
+                        <div class="vc-name">NEO</div>
+                        <div class="vc-desc">Fast · High · Robot</div>
+                        <div class="vc-wave">
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                        </div>
+                    </div>
+                    <div class="voice-card" id="vc3" style="--vc-color:#ff4ecd; --vc-rgb:255,78,205;"
+                        onclick="selectVoice(3)">
+                        <span class="vc-icon">✨</span>
+                        <div class="vc-name">NOVA</div>
+                        <div class="vc-desc">Bright · Lively · Fun</div>
+                        <div class="vc-wave">
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                            <div class="vc-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: COMMAND LOG -->
+        <div class="glass right-panel">
+            <div class="rp-header">
+                <div class="rp-title">
+                    <span class="rp-dot" id="rpDot"></span>
+                    📋 Command Log
+                </div>
+                <button class="rp-clear-btn" onclick="clearLog()">🗑 Clear</button>
+            </div>
+
+            <!-- Live transcript -->
+            <div class="transcript-bar" id="transcriptBar">
+                <span class="tr-icon">🎤</span>
+                <span id="transcriptText">Waiting for voice input…</span>
+            </div>
+
+            <!-- AI SPEECH DISPLAY -->
+            <div class="ai-speech-box" id="aiSpeechBox">
+                <div class="asb-header">
+                    <span class="asb-icon">🤖</span>
+                    <span class="asb-label">Assistant says</span>
+                    <span class="asb-lang" id="asbLang">EN + தமிழ்</span>
+                    <button class="stop-speak-btn" id="stopSpeakBtn" onclick="stopSpeaking()" title="Stop speaking">⏹
+                        Stop</button>
+                </div>
+                <div class="asb-text" id="asbText">Waiting for your command…</div>
+            </div>
+
+            <!-- Log feed -->
+            <div class="log-feed" id="logFeed">
+                <div class="log-empty" id="logEmpty">
+                    <div class="empty-icon">💬</div>
+                    <div class="empty-text">Your commands will appear here</div>
+                </div>
+            </div>
+
+            <!-- Quick-launch grid -->
+            <div class="quick-grid">
+                <div class="qc-btn" onclick="quickOpen('youtube')"><span class="qc-icon">▶️</span>YouTube</div>
+                <div class="qc-btn" onclick="quickOpen('google')"><span class="qc-icon">🔍</span>Google</div>
+                <div class="qc-btn" onclick="quickOpen('whatsapp')"><span class="qc-icon">💬</span>WhatsApp</div>
+                <div class="qc-btn" onclick="quickOpen('gmail')"><span class="qc-icon">📧</span>Gmail</div>
+                <div class="qc-btn" onclick="quickOpen('instagram')"><span class="qc-icon">📸</span>Instagram</div>
+                <div class="qc-btn" onclick="quickOpen('netflix')"><span class="qc-icon">🎬</span>Netflix</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- YouTube Modal -->
+    <div class="yt-modal-overlay" id="ytModal">
+        <div class="yt-modal">
+            <div class="yt-modal-header">
+                <div class="yt-modal-title" id="ytTitle">🎵 YouTube Player</div>
+                <button class="yt-modal-close" onclick="closeYTModal()" title="Close player">&times;</button>
+            </div>
+            <iframe id="ytFrame" src="" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="college-data.js"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>
